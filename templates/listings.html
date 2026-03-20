@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="breadcrumb-container container">
+    <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Bosh sahifa</a>
+    <span><i class="fas fa-chevron-right text-sm"></i></span>
+    <span class="active-crumb">{{ current_category.icon }} {{ current_category.name }}</span>
+</div>
+
+<section class="category-header container">
+    <div class="category-banner glassmorphism-card">
+        <h1>{{ current_category.icon }} {{ current_category.name }}</h1>
+        <p>Jami e'lonlar: <strong>{{ listings|length }}</strong> ta</p>
+    </div>
+</section>
+
+<section class="listings-section container mt-3">
+    {% if listings %}
+    <div class="listings-grid">
+        {% for item in listings %}
+            {% include 'partials/listing_card.html' %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-folder-open icon-large"></i>
+        <h3>Ushbu kategoriyada e'lonlar yo'q</h3>
+        <p>Hozircha "{{ current_category.name }}" bo'limiga e'lon qo'shilmagan.</p>
+        <a href="{{ url_for('add_listing') }}?category_id={{ current_category.id }}" class="btn btn-primary mt-3">Birinchi bo'lib e'lon bering</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

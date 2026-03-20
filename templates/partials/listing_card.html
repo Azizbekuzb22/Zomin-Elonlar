@@ -1,0 +1,30 @@
+<div class="card listing-card glassmorphism-card {% if item.is_top %}top-card{% endif %} {% if item.is_pinned %}pinned-card{% endif %}">
+    <a href="{{ url_for('single_listing', listing_id=item.id) }}" class="card-link">
+        <div class="card-image-wrapper">
+            {% if item.image_filename %}
+                <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" alt="{{ item.title }}" class="card-image" loading="lazy">
+            {% else %}
+                <div class="card-image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <span>Rasm yo'q</span>
+                </div>
+            {% endif %}
+
+            {% if item.is_pinned %}
+                <span class="badge badge-pin"><i class="fas fa-thumbtack"></i> Muhim</span>
+            {% elif item.is_top %}
+                <span class="badge badge-top"><i class="fas fa-crown"></i> TOP</span>
+            {% endif %}
+            <span class="badge badge-category">{{ item.category_name }}</span>
+        </div>
+
+        <div class="card-content">
+            <h3 class="card-title">{{ item.title }}</h3>
+            <p class="card-price">{{ "{:,.0f}".format(item.price) }} so'm</p>
+            <div class="card-meta">
+                <span><i class="fas fa-clock"></i> {{ item.created_at | timeago }}</span>
+                <span><i class="fas fa-map-marker-alt"></i> Zomin</span>
+            </div>
+        </div>
+    </a>
+</div>

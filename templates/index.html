@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container hero-content">
+        <h1 class="hero-title">Zominning eng katta <br><span class="highlight">e'lonlar platformasi</span></h1>
+        <p class="hero-subtitle">Mashina, uy, ish, va istalgan narsani soting yoki sotib oling!</p>
+
+        <form class="search-form glassmorphism" action="{{ url_for('index') }}" method="GET">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" name="q" placeholder="Nima qidiryapsiz? Masalan, 'Tiko', 'Uy', 'Telefon'..." value="{{ query }}" class="search-input">
+            </div>
+            <button type="submit" class="btn btn-primary search-btn">Izlash</button>
+        </form>
+
+        <div class="quick-categories">
+            {% for cat in categories[:6] %}
+            <a href="{{ url_for('category_view', slug=cat.slug) }}" class="cat-pill">
+                {{ cat.icon }} {{ cat.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Banner Reklama section -->
+{% if banners %}
+<section class="banners-section container mb-4">
+    <div class="banners-grid">
+        {% for banner in banners %}
+        <a href="{{ banner.link_url or '#' }}" class="banner-item" {% if banner.link_url %}target="_blank"{% endif %}>
+            {% if banner.image_filename %}
+                <img src="{{ url_for('static', filename='uploads/' + banner.image_filename) }}" alt="{{ banner.title }}" class="banner-img">
+            {% else %}
+                <div class="banner-placeholder">
+                    <i class="fas fa-ad"></i>
+                    <span>{{ banner.title }}</span>
+                </div>
+            {% endif %}
+            <div class="banner-label">Reklama</div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Main Listings Section -->
+<section class="listings-section container">
+
+    {% if query %}
+        <h2 class="section-title">"{{ query }}" bo'yicha natijalar ({{ (top_listings|length) + (listings|length) }})</h2>
+        {% if not listings and not top_listings %}
+        <div class="empty-state">
+            <i class="fas fa-search-minus icon-large"></i>
+            <h3>Hech narsa topilmadi</h3>
+            <p>Qidiruv shartlarini o'zgartirib qayta urinib ko'ring.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Barcha e'lonlar</a>
+        </div>
+        {% endif %}
+    {% else %}
+
+        <!-- Pinlangan e'lonlar -->
+        {% if pinned_listings %}
+        <div class="section-header">
+            <h2 class="section-title"><i class="fas fa-thumbtack pin-icon"></i> Muhim E'lonlar</h2>
+        </div>
+        <div class="listings-grid mb-4">
+            {% for item in pinned_listings %}
+                {% set is_pinned = true %}
+                {% include 'partials/listing_card.html' %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- TOP e'lonlar -->
+        {% if top_listings %}
+        <div class="section-header">
+            <h2 class="section-title"><i class="fas fa-crown text-warning"></i> TOP E'lonlar</h2>
+        </div>
+        <div class="listings-grid mb-4">
+            {% for item in top_listings %}
+                {% set is_pinned = false %}
+                {% include 'partials/listing_card.html' %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="section-header">
+            <h2 class="section-title">So'nggi E'lonlar</h2>
+        </div>
+    {% endif %}
+
+    {% if listings %}
+    <div class="listings-grid">
+        {% for item in listings %}
+            {% set is_pinned = false %}
+            {% include 'partials/listing_card.html' %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if not query and not pinned_listings and not top_listings and not listings %}
+    <div class="empty-state">
+        <i class="fas fa-box-open icon-large"></i>
+        <h3>Hozircha e'lonlar yo'q</h3>
+        <p>Birinchi bo'lib e'lon bering va xaridorlarni toping.</p>
+        <a href="{{ url_for('add_listing') }}" class="btn btn-primary mt-3">E'lon berish</a>
+    </div>
+    {% endif %}
+
+</section>
+{% endblock %}

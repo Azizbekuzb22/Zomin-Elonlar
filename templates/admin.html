@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% block title %}Admin Panel - Zomin E'lonlar{% endblock %}
+
+{% block content %}
+<section class="admin-panel container">
+
+    <!-- Admin Header -->
+    <div class="admin-header glassmorphism-card mb-4">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+                <h1><i class="fas fa-shield-alt text-danger"></i> Admin Panel</h1>
+                <p style="color:var(--gray);margin-top:5px;">Barcha e'lonlar va bannerlarni boshqarish</p>
+            </div>
+            <div style="display:flex;gap:10px;">
+                <a href="{{ url_for('add_listing') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Yangi e'lon
+                </a>
+                <a href="{{ url_for('admin_logout') }}" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Chiqish
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid mb-4">
+        <div class="stat-card glassmorphism-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#4361ee,#4895ef)">
+                <i class="fas fa-list"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ stats.total }}</span>
+                <span class="stat-label">Jami e'lonlar</span>
+            </div>
+        </div>
+        <div class="stat-card glassmorphism-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#10b981,#34d399)">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ stats.today }}</span>
+                <span class="stat-label">Bugun qo'shildi</span>
+            </div>
+        </div>
+        <div class="stat-card glassmorphism-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">
+                <i class="fas fa-crown"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ stats.top }}</span>
+                <span class="stat-label">TOP e'lonlar</span>
+            </div>
+        </div>
+        <div class="stat-card glassmorphism-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#f72585,#b5179e)">
+                <i class="fas fa-thumbtack"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ stats.pinned }}</span>
+                <span class="stat-label">Pinlangan</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="glassmorphism-card mb-4">
+        <form method="GET" action="{{ url_for('admin_panel') }}" class="admin-filter-form">
+            <div class="filter-group">
+                <div class="search-input-wrapper admin-search">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" name="q" placeholder="E'lon qidirish..." value="{{ q }}" class="search-input">
+                </div>
+                <select name="cat" class="filter-select">
+                    <option value="">Barcha kategoriyalar</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if cat_filter == cat.slug %}selected{% endif %}>
+                        {{ cat.icon }} {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filtrlash</button>
+                {% if q or cat_filter %}
+                <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary"><i class="fas fa-times"></i> Tozalash</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Listings Table -->
+    <div class="glassmorphism-card mb-5">
+        <h3 class="mb-3">
+            E'lonlar ro'yxati
+            <span class="badge" style="background:var(--primary);color:white;position:static;padding:4px 12px;font-size:14px;border-radius:20px;">{{ listings|length }}</span>
+        </h3>
+
+        {% if listings %}
+        <div class="table-responsive">
+            <table class="modern-table w-100">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Rasm</th>
+                        <th>Sarlavha</th>
+                        <th>Kategoriya</th>
+                        <th>Narx</th>
+                        <th>Vaqt</th>
+                        <th>Holati</th>
+                        <th>Harakatlar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in listings %}
+                    <tr>
+                        <td><span class="text-muted">#{{ item.id }}</span></td>
+                        <td>
+                            {% if item.image_filename %}
+                            <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" class="admin-thumbnail" alt="">
+                            {% else %}
+                            <div class="admin-thumbnail" style="background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('single_listing', listing_id=item.id) }}" target="_blank">
+                                <strong>{{ item.title }}</strong>
+                            </a>
+                        </td>
+                        <td><span class="badge badge-category" style="position:static;">{{ item.category_name }}</span></td>
+                        <td><span class="text-primary font-weight-bold">{{ "{:,.0f}".format(item.price) }}</span></td>
+                        <td><span class="text-muted" style="font-size:13px;">{{ item.created_at | timeago }}</span></td>
+                        <td>
+                            <div style="display:flex;flex-direction:column;gap:4px;">
+                                {% if item.is_pinned %}
+                                    <span class="status-badge status-pin"><i class="fas fa-thumbtack"></i> PIN</span>
+                                {% endif %}
+                                {% if item.is_top %}
+                                    <span class="status-badge status-top"><i class="fas fa-crown"></i> TOP</span>
+                                {% endif %}
+                                {% if not item.is_pinned and not item.is_top %}
+                                    <span class="status-badge status-normal">Oddiy</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="admin-actions-row">
+                                <!-- Edit -->
+                                <a href="{{ url_for('edit_listing', listing_id=item.id) }}" class="btn btn-sm btn-edit" title="Tahrirlash">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <!-- Toggle PIN -->
+                                <form action="{{ url_for('admin_panel') }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="listing_id" value="{{ item.id }}">
+                                    <input type="hidden" name="action" value="toggle_pin">
+                                    <button type="submit" class="btn btn-sm {% if item.is_pinned %}btn-secondary{% else %}btn-pin{% endif %}" title="{% if item.is_pinned %}PIN dan olish{% else %}PIN lash{% endif %}">
+                                        <i class="fas fa-thumbtack"></i>
+                                    </button>
+                                </form>
+                                <!-- Toggle TOP -->
+                                <form action="{{ url_for('admin_panel') }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="listing_id" value="{{ item.id }}">
+                                    <input type="hidden" name="action" value="toggle_top">
+                                    <button type="submit" class="btn btn-sm {% if item.is_top %}btn-secondary{% else %}btn-warning{% endif %}" title="{% if item.is_top %}TOP dan olish{% else %}TOP ga chiqarish{% endif %}">
+                                        <i class="fas fa-crown"></i>
+                                    </button>
+                                </form>
+                                <!-- Delete -->
+                                <form action="{{ url_for('admin_panel') }}" method="POST" class="d-inline" onsubmit="return confirm('Haqiqatdan ham o\'chirmoqchimisiz?');">
+                                    <input type="hidden" name="listing_id" value="{{ item.id }}">
+                                    <input type="hidden" name="action" value="delete">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="O'chirish">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state" style="padding:40px;">
+            <i class="fas fa-search-minus icon-large"></i>
+            <h3>Hech narsa topilmadi</h3>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ===== BANNERLAR bo'limi ===== -->
+    <div id="banners" class="glassmorphism-card mb-5">
+        <h3 class="mb-4"><i class="fas fa-ad text-primary"></i> Reklama Bannerlar</h3>
+
+        <!-- Banner qo'shish formasi -->
+        <div class="banner-add-form glassmorphism-card mb-4" style="background:rgba(67,97,238,0.04);border:1px dashed #4361ee;">
+            <h4 class="mb-3"><i class="fas fa-plus-circle text-primary"></i> Yangi Banner Qo'shish</h4>
+            <form action="{{ url_for('add_banner') }}" method="POST" enctype="multipart/form-data" class="modern-form">
+                <div class="form-row">
+                    <div class="form-group half-width">
+                        <label>Banner Sarlavhasi *</label>
+                        <input type="text" name="title" placeholder="Masalan: Zomin Supermarket" required>
+                    </div>
+                    <div class="form-group half-width">
+                        <label>Havola URL (ixtiyoriy)</label>
+                        <input type="url" name="link_url" placeholder="https://t.me/sizning_kanal">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Banner Rasmi</label>
+                    <div class="file-upload-wrapper" style="padding:20px;">
+                        <input type="file" name="banner_image" accept="image/png,image/jpeg,image/webp" class="file-input">
+                        <div class="upload-placeholder">
+                            <i class="fas fa-cloud-upload-alt upload-icon" style="font-size:28px;"></i>
+                            <p>Rasm tanlang (700×200 px tavsiya etiladi)</p>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Banner Qo'shish</button>
+            </form>
+        </div>
+
+        <!-- Mavjud bannerlar -->
+        {% if banners %}
+        <div class="banners-admin-list">
+            {% for b in banners %}
+            <div class="banner-admin-item glassmorphism-card mb-3 {% if not b.is_active %}banner-inactive{% endif %}">
+                {% if b.image_filename %}
+                <img src="{{ url_for('static', filename='uploads/' + b.image_filename) }}" alt="" style="height:60px;width:140px;object-fit:cover;border-radius:8px;flex-shrink:0;">
+                {% else %}
+                <div style="height:60px;width:140px;background:#e2e8f0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#94a3b8;flex-shrink:0;">
+                    <i class="fas fa-image"></i>
+                </div>
+                {% endif %}
+                <div style="flex:1;">
+                    <strong>{{ b.title }}</strong>
+                    {% if b.link_url %}<br><a href="{{ b.link_url }}" target="_blank" style="font-size:13px;color:var(--gray);">{{ b.link_url[:40] }}...</a>{% endif %}
+                </div>
+                <div style="display:flex;gap:8px;flex-shrink:0;">
+                    <form action="{{ url_for('toggle_banner', banner_id=b.id) }}" method="POST">
+                        <button type="submit" class="btn btn-sm {% if b.is_active %}btn-success{% else %}btn-secondary{% endif %}">
+                            <i class="fas {% if b.is_active %}fa-eye{% else %}fa-eye-slash{% endif %}"></i>
+                            {% if b.is_active %}Faol{% else %}Yashirin{% endif %}
+                        </button>
+                    </form>
+                    <form action="{{ url_for('delete_banner', banner_id=b.id) }}" method="POST" onsubmit="return confirm('Bannerni o\'chirasizmi?');">
+                        <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center" style="padding:30px;color:var(--gray);">
+            <i class="fas fa-ad" style="font-size:40px;opacity:0.3;"></i>
+            <p class="mt-3">Hozircha bannerlar yo'q. Yuqoridagi forma orqali qo'shing.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</section>
+{% endblock %}

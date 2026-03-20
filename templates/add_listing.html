@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="add-listing-section container">
+    <div class="form-container glassmorphism-card">
+        <h2 class="section-title"><i class="fas fa-plus-circle text-primary"></i> Yangi E'lon Berish</h2>
+        <p class="form-subtitle">Sotmoqchi bo'lgan narsangiz haqida ma'lumot kiriting</p>
+
+        <form action="{{ url_for('add_listing') }}" method="POST" enctype="multipart/form-data" class="modern-form" id="addListingForm">
+            
+            <div class="form-group">
+                <label for="title">Sarlavha *</label>
+                <input type="text" id="title" name="title" required placeholder="Masalan: Tiko 2005 yil oq rangda" maxlength="100">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="category">Kategoriya *</label>
+                    <select id="category" name="category_id" required>
+                        <option value="" disabled selected>Kategoriyani tanlang</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.icon }} {{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group half-width">
+                    <label for="price">Narxi (so'm) *</label>
+                    <input type="number" id="price" name="price" required placeholder="Masalan: 35000000" min="0" step="any">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Tavsif (ixtiyoriy)</label>
+                <textarea id="description" name="description" rows="5" placeholder="Qo'shimcha ma'lumotlarni kiriting..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="contact_phone">Telefon raqami</label>
+                    <input type="tel" id="contact_phone" name="contact_phone" placeholder="+998 90 123 45 67">
+                </div>
+
+                <div class="form-group half-width">
+                    <label for="contact_telegram">Telegram User (ixtiyoriy)</label>
+                    <div class="input-with-icon">
+                        <span class="icon-prefix">@</span>
+                        <input type="text" id="contact_telegram" name="contact_telegram" placeholder="username">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Rasm yuklash</label>
+                <div class="file-upload-wrapper" id="drop-area">
+                    <input type="file" id="image" name="image" accept="image/png, image/jpeg, image/webp" class="file-input">
+                    <div class="upload-placeholder">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <p>Rasmni shu yerga tashlang yoki <b>tanlash uchun bosing</b></p>
+                        <span class="upload-hint">Formatlar: JPG, PNG, WEBP (Max 16MB)</span>
+                    </div>
+                    <img id="image-preview" src="" alt="Preview" class="d-none">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-large btn-block" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i> E'lonni joylashtirish
+                </button>
+            </div>
+            
+        </form>
+    </div>
+</section>
+{% endblock %}

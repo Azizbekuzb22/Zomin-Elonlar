@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}E'lonni tahrirlash - Zomin E'lonlar{% endblock %}
+
+{% block content %}
+<div class="breadcrumb-container container">
+    <a href="{{ url_for('admin_panel') }}"><i class="fas fa-shield-alt"></i> Admin panel</a>
+    <span><i class="fas fa-chevron-right text-sm"></i></span>
+    <span class="active-crumb">Tahrirlash: {{ listing.title[:40] }}...</span>
+</div>
+
+<section class="add-listing-section container">
+    <div class="form-container glassmorphism-card">
+        <h2 class="section-title"><i class="fas fa-edit text-primary"></i> E'lonni Tahrirlash</h2>
+        <p class="form-subtitle">Ma'lumotlarni o'zgartirib "Saqlash" tugmasini bosing</p>
+
+        <form action="{{ url_for('edit_listing', listing_id=listing.id) }}" method="POST" enctype="multipart/form-data" class="modern-form">
+
+            <div class="form-group">
+                <label for="title">Sarlavha *</label>
+                <input type="text" id="title" name="title" required maxlength="100" value="{{ listing.title }}">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="category">Kategoriya *</label>
+                    <select id="category" name="category_id" required>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if cat.id == listing.category_id %}selected{% endif %}>
+                            {{ cat.icon }} {{ cat.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group half-width">
+                    <label for="price">Narxi (so'm) *</label>
+                    <input type="number" id="price" name="price" required min="0" step="any" value="{{ listing.price }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Tavsif</label>
+                <textarea id="description" name="description" rows="5">{{ listing.description or '' }}</textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="contact_phone">Telefon raqami</label>
+                    <input type="tel" id="contact_phone" name="contact_phone" value="{{ listing.contact_phone or '' }}">
+                </div>
+
+                <div class="form-group half-width">
+                    <label for="contact_telegram">Telegram username</label>
+                    <div class="input-with-icon">
+                        <span class="icon-prefix">@</span>
+                        <input type="text" id="contact_telegram" name="contact_telegram" value="{{ listing.contact_telegram or '' }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Rasm (yangi rasm yuklasangiz, eskisi o'chadi)</label>
+                {% if listing.image_filename %}
+                <div class="current-image-preview mb-3">
+                    <p style="color:var(--gray); margin-bottom:8px; font-size:14px;"><i class="fas fa-image"></i> Hozirgi rasm:</p>
+                    <img src="{{ url_for('static', filename='uploads/' + listing.image_filename) }}" alt="Hozirgi rasm" style="max-height:200px; border-radius:12px; border:2px solid #e2e8f0;">
+                </div>
+                {% endif %}
+                <div class="file-upload-wrapper" id="drop-area">
+                    <input type="file" id="image" name="image" accept="image/png, image/jpeg, image/webp" class="file-input">
+                    <div class="upload-placeholder">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <p>Yangi rasm yuklash uchun bosing yoki tashlang</p>
+                        <span class="upload-hint">Formatlar: JPG, PNG, WEBP (Max 16MB)</span>
+                    </div>
+                    <img id="image-preview" src="" alt="Preview" class="d-none">
+                </div>
+            </div>
+
+            <div class="form-actions" style="display:flex; gap:15px;">
+                <button type="submit" class="btn btn-primary btn-large" style="flex:1">
+                    <i class="fas fa-save"></i> Saqlash
+                </button>
+                <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary btn-large" style="flex:1; text-align:center;">
+                    <i class="fas fa-times"></i> Bekor qilish
+                </a>
+            </div>
+
+        </form>
+    </div>
+</section>
+{% endblock %}

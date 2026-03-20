@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Sahifa topilmadi - Zomin E'lonlar{% endblock %}
+
+{% block content %}
+<section class="error-page container flex-center text-center">
+    <div class="error-content glassmorphism-card">
+        <h1 class="error-code">404</h1>
+        <h2 class="error-message">Kechirasiz, sahifa topilmadi</h2>
+        <p class="mb-4">Siz qidirayotgan sahifa o'chirilgan yoki ko'chirilgan bo'lishi mumkin.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-large">
+            <i class="fas fa-home"></i> Bosh sahifaga qaytish
+        </a>
+    </div>
+</section>
+{% endblock %}

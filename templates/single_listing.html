@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ listing.title }} - Zomin E'lonlar{% endblock %}
+
+{% block content %}
+<div class="breadcrumb-container container">
+    <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Bosh sahifa</a>
+    <span><i class="fas fa-chevron-right text-sm"></i></span>
+    <a href="{{ url_for('category_view', slug=listing.category_slug) }}">{{ listing.category_name }}</a>
+    <span><i class="fas fa-chevron-right text-sm"></i></span>
+    <span class="active-crumb text-truncate" style="max-width: 150px;">{{ listing.title }}</span>
+</div>
+
+<section class="single-listing container">
+    <div class="listing-layout">
+        
+        <div class="listing-main">
+            <div class="product-gallery glassmorphism-card">
+                {% if listing.image_filename %}
+                    <img src="{{ url_for('static', filename='uploads/' + listing.image_filename) }}" alt="{{ listing.title }}" class="main-image zoom-hover">
+                {% else %}
+                    <div class="main-image-placeholder">
+                        <i class="fas fa-image" style="font-size: 5rem; color: #ccc;"></i>
+                        <p>Rasm yuklanmagan</p>
+                    </div>
+                {% endif %}
+                
+                {% if listing.is_top %}
+                    <div class="badge-overlay">
+                        <span class="badge badge-top"><i class="fas fa-crown"></i> TOP E'lon</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="product-details glassmorphism-card mt-3">
+                <h1 class="product-title">{{ listing.title }}</h1>
+                <div class="product-meta">
+                    <span class="meta-item"><i class="fas fa-clock"></i> Qo'shildi: {{ listing.created_at | timeago }}</span>
+                    <span class="meta-item"><i class="fas fa-eye text-primary"></i> 124 Marta ko'rildi</span>
+                    <span class="meta-item"><i class="fas fa-shield-alt text-success"></i> Tekshirilgan</span>
+                </div>
+                
+                <h2 class="price-large text-primary">{{ listing.price | round(2) }} <span>so'm</span></h2>
+                
+                <hr class="divider">
+                
+                <h3>Batafsil ma'lumot</h3>
+                <div class="product-description">
+                    {% if listing.description %}
+                        {{ listing.description|replace('\n', '<br>')|safe }}
+                    {% else %}
+                        <p class="text-muted">Izoh qoldirilmagan.</p>
+                    {% endif %}
+                </div>
+                
+                <div class="safety-tips mt-4 info-box">
+                    <h4><i class="fas fa-shield-alt text-warning"></i> Xavfsizlik qoidalari</h4>
+                    <ul>
+                        <li>Xarid qilishdan oldin mahsulotni ko'ring va tekshiring.</li>
+                        <li>Oldindan pul o'tkazmang (zakalat bermang).</li>
+                        <li>Shubhali havolalarga kirmang.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="listing-sidebar">
+            <div class="seller-card glassmorphism-card text-center mb-3 sticky-sidebar">
+                <div class="seller-avatar">
+                     <i class="fas fa-user-circle"></i>
+                </div>
+                <h3 class="seller-name">Sotuvchi</h3>
+                <p class="seller-meta">Zomin tumani</p>
+                
+                <div class="contact-actions">
+                    {% if listing.contact_phone %}
+                    <a href="tel:{{ listing.contact_phone }}" class="btn btn-success btn-block mb-2 action-btn">
+                        <i class="fas fa-phone-alt shake-animation"></i> {{ listing.contact_phone }}
+                    </a>
+                    {% endif %}
+                    
+                    {% if listing.contact_telegram %}
+                    <a href="https://t.me/{{ listing.contact_telegram }}" target="_blank" class="btn btn-info btn-block action-btn tg-btn">
+                        <i class="fab fa-telegram-plane"></i> Telegramdan yozish
+                    </a>
+                    {% endif %}
+                    
+                    {% if not listing.contact_phone and not listing.contact_telegram %}
+                    <div class="alert alert-warning mb-0">Aloqa ma'lumotlari ko'rsatilmagan</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="report-box text-center">
+                <a href="#" class="text-danger report-link" onclick="alert('Shikoyatingiz qabul qilindi. Tez orada adminlar ko\'rib chiqadi.'); return false;"><i class="fas fa-flag"></i> E'lon ustidan shikoyat qilish</a>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+{% if similar %}
+<section class="similar-listings container mt-5 mb-5">
+    <div class="section-header">
+        <h2 class="section-title">Shunga o'xshash e'lonlar</h2>
+    </div>
+    <div class="listings-grid grid-similar">
+        {% for item in similar %}
+            {% include 'partials/listing_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

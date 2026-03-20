@@ -1,0 +1,24 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Database (local version)
+zomin_market.db
+
+# Uploads (local files)
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Migration temp files
+migrate.py
+update_db.py
+
+# VS Code
+.vscode/
+pyrightconfig.json
+
+# Environment
+.env
+venv/
+env/
