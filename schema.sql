@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS listings (
     contact_phone TEXT,
     contact_telegram TEXT,
     image_filename TEXT,
+    views INTEGER DEFAULT 0,
+    condition TEXT DEFAULT 'Noma''lum',
     is_top BOOLEAN DEFAULT 0,
     is_pinned BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

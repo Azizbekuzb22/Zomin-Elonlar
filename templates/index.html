@@ -1,26 +1,88 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- Hero Section -->
+<!-- HERO SECTION with animated gradient -->
 <section class="hero-section">
+    <div class="hero-animated-bg">
+        <div class="hero-blob blob-1"></div>
+        <div class="hero-blob blob-2"></div>
+        <div class="hero-blob blob-3"></div>
+    </div>
     <div class="container hero-content">
-        <h1 class="hero-title">Zominning eng katta <br><span class="highlight">e'lonlar platformasi</span></h1>
-        <p class="hero-subtitle">Mashina, uy, ish, va istalgan narsani soting yoki sotib oling!</p>
+        <div class="hero-badge animate-fadein">
+            <i class="fas fa-bolt text-warning"></i>
+            Zomin tumani #1 e'lonlar platformasi
+        </div>
+        <h1 class="hero-title animate-fadeup">
+            Istalgan narsani <br><span class="highlight animated-text">soting yoki toping</span>
+        </h1>
+        <p class="hero-subtitle animate-fadeup" style="animation-delay:0.1s;">
+            Mashina, uy, telefon, kiyim — hammasi bir joyda. <b>Bepul</b> e'lon bering!
+        </p>
 
-        <form class="search-form glassmorphism" action="{{ url_for('index') }}" method="GET">
+        <form class="search-form glassmorphism animate-fadeup" action="{{ url_for('index') }}" method="GET" style="animation-delay:0.2s;">
             <div class="search-input-wrapper">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" name="q" placeholder="Nima qidiryapsiz? Masalan, 'Tiko', 'Uy', 'Telefon'..." value="{{ query }}" class="search-input">
+                <input type="text" name="q" id="hero-search" placeholder="Nima qidiryapsiz? Masalan, 'Tiko', 'Uy', 'Telefon'..." value="{{ query }}" class="search-input" autocomplete="off">
             </div>
             <button type="submit" class="btn btn-primary search-btn">Izlash</button>
         </form>
 
-        <div class="quick-categories">
+        <div class="hero-add-btn animate-fadeup" style="animation-delay:0.3s;">
+            <a href="{{ url_for('add_listing') }}" class="btn-add-hero">
+                <i class="fas fa-plus-circle"></i> E'lon berish — Bepul!
+            </a>
+            <span class="hero-add-note"><i class="fas fa-lock"></i> Tez, oson, xavfsiz</span>
+        </div>
+
+        <div class="quick-categories animate-fadeup" style="animation-delay:0.4s;">
             {% for cat in categories[:6] %}
             <a href="{{ url_for('category_view', slug=cat.slug) }}" class="cat-pill">
                 {{ cat.icon }} {{ cat.name }}
             </a>
             {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- STATS SECTION (Trust signal) -->
+<section class="stats-section container">
+    <div class="stats-grid">
+        <div class="stat-item glassmorphism-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#4361ee,#4895ef);">
+                <i class="fas fa-list-alt"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-num" id="stat-listings">{{ (pinned_listings|length) + (top_listings|length) + (listings|length) }}+</div>
+                <div class="stat-label">Faol e'lonlar</div>
+            </div>
+        </div>
+        <div class="stat-item glassmorphism-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#f72585,#b5179e);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-num">500+</div>
+                <div class="stat-label">Kunlik foydalanuvchi</div>
+            </div>
+        </div>
+        <div class="stat-item glassmorphism-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#4cc9f0,#4895ef);">
+                <i class="fas fa-handshake"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-num">1000+</div>
+                <div class="stat-label">Muvaffaqiyatli sotuvlar</div>
+            </div>
+        </div>
+        <div class="stat-item glassmorphism-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#fca311,#e07b00);">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-num">4.9 ⭐</div>
+                <div class="stat-label">Foydalanuvchi bahosi</div>
+            </div>
         </div>
     </div>
 </section>
@@ -46,16 +108,18 @@
 </section>
 {% endif %}
 
-<!-- Main Listings Section -->
+<!-- MAIN LISTINGS SECTION -->
 <section class="listings-section container">
 
     {% if query %}
-        <h2 class="section-title">"{{ query }}" bo'yicha natijalar ({{ (top_listings|length) + (listings|length) }})</h2>
+        <div class="section-header">
+            <h2 class="section-title">🔍 "{{ query }}" bo'yicha natijalar <span class="result-count">{{ (top_listings|length) + (listings|length) }} ta</span></h2>
+        </div>
         {% if not listings and not top_listings %}
         <div class="empty-state">
             <i class="fas fa-search-minus icon-large"></i>
             <h3>Hech narsa topilmadi</h3>
-            <p>Qidiruv shartlarini o'zgartirib qayta urinib ko'ring.</p>
+            <p>Qidiruv so'zlarini o'zgartirib qayta urinib ko'ring.</p>
             <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Barcha e'lonlar</a>
         </div>
         {% endif %}
@@ -64,11 +128,11 @@
         <!-- Pinlangan e'lonlar -->
         {% if pinned_listings %}
         <div class="section-header">
-            <h2 class="section-title"><i class="fas fa-thumbtack pin-icon"></i> Muhim E'lonlar</h2>
+            <h2 class="section-title"><span class="pin-badge">📌</span> Muhim E'lonlar</h2>
+            <div class="section-line"></div>
         </div>
         <div class="listings-grid mb-4">
             {% for item in pinned_listings %}
-                {% set is_pinned = true %}
                 {% include 'partials/listing_card.html' %}
             {% endfor %}
         </div>
@@ -77,25 +141,25 @@
         <!-- TOP e'lonlar -->
         {% if top_listings %}
         <div class="section-header">
-            <h2 class="section-title"><i class="fas fa-crown text-warning"></i> TOP E'lonlar</h2>
+            <h2 class="section-title"><span class="crown-badge">👑</span> TOP E'lonlar</h2>
+            <div class="section-line"></div>
         </div>
         <div class="listings-grid mb-4">
             {% for item in top_listings %}
-                {% set is_pinned = false %}
                 {% include 'partials/listing_card.html' %}
             {% endfor %}
         </div>
         {% endif %}
 
         <div class="section-header">
-            <h2 class="section-title">So'nggi E'lonlar</h2>
+            <h2 class="section-title">🕐 So'nggi E'lonlar</h2>
+            <div class="section-line"></div>
         </div>
     {% endif %}
 
     {% if listings %}
     <div class="listings-grid">
         {% for item in listings %}
-            {% set is_pinned = false %}
             {% include 'partials/listing_card.html' %}
         {% endfor %}
     </div>
@@ -103,12 +167,51 @@
 
     {% if not query and not pinned_listings and not top_listings and not listings %}
     <div class="empty-state">
-        <i class="fas fa-box-open icon-large"></i>
+        <div class="empty-icon-anim">📦</div>
         <h3>Hozircha e'lonlar yo'q</h3>
-        <p>Birinchi bo'lib e'lon bering va xaridorlarni toping.</p>
-        <a href="{{ url_for('add_listing') }}" class="btn btn-primary mt-3">E'lon berish</a>
+        <p>Birinchi bo'lib e'lon bering va minglab xaridorlarni toping!</p>
+        <a href="{{ url_for('add_listing') }}" class="btn btn-primary mt-3 btn-large">
+            <i class="fas fa-plus"></i> E'lon berish (Bepul)
+        </a>
     </div>
     {% endif %}
 
 </section>
+
+<!-- HOW IT WORKS SECTION -->
+<section class="how-section container">
+    <div class="section-header" style="text-align:center;">
+        <h2 class="section-title">Qanday ishlaydi?</h2>
+        <p style="color:var(--gray); margin-top:4px;">3 ta oson qadam bilan boshlang</p>
+    </div>
+    <div class="how-grid">
+        <div class="how-step glassmorphism-card">
+            <div class="how-icon" style="background:linear-gradient(135deg,#4361ee20,#4361ee40);">
+                <span>📸</span>
+            </div>
+            <h3>1. Rasm yuklang</h3>
+            <p>Sotmoqchi bo'lgan narsingizning rasmini oling va yuklang</p>
+        </div>
+        <div class="how-step glassmorphism-card">
+            <div class="how-icon" style="background:linear-gradient(135deg,#f7258520,#f7258540);">
+                <span>📝</span>
+            </div>
+            <h3>2. Ma'lumot kiriting</h3>
+            <p>Narx, tavsif va aloqa raqamingizni kiriting</p>
+        </div>
+        <div class="how-step glassmorphism-card">
+            <div class="how-icon" style="background:linear-gradient(135deg,#4cc9f020,#4cc9f040);">
+                <span>🤝</span>
+            </div>
+            <h3>3. Xaridor toping</h3>
+            <p>E'loningiz yuzlab odamlarga ko'rinadi va sotuvchi qo'ng'iroq qiladi</p>
+        </div>
+    </div>
+    <div style="text-align:center; margin-top:30px;">
+        <a href="{{ url_for('add_listing') }}" class="btn btn-primary btn-large" style="border-radius:30px; padding:14px 40px; font-size:18px;">
+            <i class="fas fa-rocket"></i> Hoziroq boshlash
+        </a>
+    </div>
+</section>
+
 {% endblock %}

@@ -146,6 +146,31 @@ def category_view(slug):
     conn.close()
     return render_template('listings.html', listings=listings, current_category=cat)
 
+@app.route('/favorites')
+def favorites():
+    ids_param = request.args.get('ids', '')
+    if not ids_param:
+        return render_template('listings.html', listings=[], page_title="Saralangan e'lonlar")
+        
+    ids_list = [int(id.strip()) for id in ids_param.split(',') if id.strip().isdigit()]
+    if not ids_list:
+        return render_template('listings.html', listings=[], page_title="Saralangan e'lonlar")
+
+    conn = get_db_connection()
+    placeholders = ','.join('?' * len(ids_list))
+    cursor = conn.execute(
+        f'''
+        SELECT l.*, c.name as category_name, c.slug as category_slug 
+        FROM listings l 
+        JOIN categories c ON l.category_id = c.id 
+        WHERE l.id IN ({placeholders})
+        ORDER BY l.created_at DESC
+        ''', ids_list
+    )
+    listings = cursor.fetchall()
+    conn.close()
+    return render_template('listings.html', listings=listings, page_title="Saralangan e'lonlar")
+
 @app.route('/add', methods=['GET', 'POST'])
 def add_listing():
     if request.method == 'POST':
@@ -153,6 +178,7 @@ def add_listing():
         description = request.form.get('description')
         price = request.form.get('price')
         category_id = request.form.get('category_id')
+        condition = request.form.get('condition', 'Noma\'lum')
         contact_phone = request.form.get('contact_phone', '').strip()
         contact_telegram = request.form.get('contact_telegram', '').strip()
         
@@ -180,10 +206,10 @@ def add_listing():
         conn.execute(
             '''
             INSERT INTO listings 
-            (title, description, price, category_id, contact_phone, contact_telegram, image_filename) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (title, description, price, category_id, condition, contact_phone, contact_telegram, image_filename) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''',
-            (title, description, price_val, category_id, contact_phone, contact_telegram, filename)
+            (title, description, price_val, category_id, condition, contact_phone, contact_telegram, filename)
         )
         conn.commit()
         conn.close()
@@ -195,6 +221,11 @@ def add_listing():
 @app.route('/listing/<int:listing_id>')
 def single_listing(listing_id):
     conn = get_db_connection()
+    
+    # Prosmotr (views) sonini 1 taga oshiramiz
+    conn.execute('UPDATE listings SET views = views + 1 WHERE id = ?', (listing_id,))
+    conn.commit()
+
     listing = conn.execute(
         '''
         SELECT l.*, c.name as category_name, c.slug as category_slug
